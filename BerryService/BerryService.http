@@ -1,0 +1,6 @@
+@BerryService_HostAddress = http://localhost:5008
+
+GET {{BerryService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
