@@ -20,7 +20,7 @@
   vegetables-service:
     build:
       context: .
-      dockerfile: VegetableService/Dockerfile
+      dockerfile: VegetablesService/Dockerfile
     ports:
       - "5003:80"
     networks:
@@ -32,6 +32,15 @@
       dockerfile: NutsService/Dockerfile
     ports:
       - "5004:80"
+    networks:
+      - greenmarket-network
+        
+  seeds-service:
+    build:
+      context: .
+      dockerfile: SeedsService/Dockerfile
+    ports:
+      - "5005:80"
     networks:
       - greenmarket-network
 
@@ -46,6 +55,7 @@
       - fruits-service
       - vegetables-service
       - nuts-service
+      - seeds-service
     networks:
       - greenmarket-network
 

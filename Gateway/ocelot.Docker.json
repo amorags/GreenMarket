@@ -10,6 +10,21 @@
       "UpstreamHttpMethod": ["GET", "HEAD"]
     },
     {
+      "DownstreamPathTemplate": "/api/seeds",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "seeds-service",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/seeds",
+      "UpstreamHttpMethod": [
+        "GET",
+        "HEAD"
+      ]
+    },
+    {
       "DownstreamPathTemplate": "/api/fruits",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [

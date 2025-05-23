@@ -1,4 +1,4 @@
-// VegetableService
+// VegetablesService
 var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
