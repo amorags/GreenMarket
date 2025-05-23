@@ -1,0 +1,67 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/berries",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5008
+        }
+      ],
+      "UpstreamPathTemplate": "/api/berries",
+      "UpstreamHttpMethod": [
+        "GET",
+        "HEAD"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/fruits",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5026
+        }
+      ],
+      "UpstreamPathTemplate": "/api/fruits",
+      "UpstreamHttpMethod": [
+        "GET",
+        "HEAD"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/vegetables",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5155
+        }
+      ],
+      "UpstreamPathTemplate": "/api/vegetables",
+      "UpstreamHttpMethod": [
+        "GET",
+        "HEAD"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/nuts",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5030
+        }
+      ],
+      "UpstreamPathTemplate": "/api/nuts",
+      "UpstreamHttpMethod": [
+        "GET",
+        "HEAD"
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5126"
+  }
+}

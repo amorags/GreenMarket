@@ -1,4 +1,4 @@
-// FruitService
+// NutsService
 var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
