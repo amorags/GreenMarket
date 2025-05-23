@@ -1,0 +1,54 @@
+﻿services:
+  berries-service:
+    build:
+      context: .
+      dockerfile: BerryService/Dockerfile
+    ports:
+      - "5001:80"
+    networks:
+      - greenmarket-network
+
+  fruits-service:
+    build:
+      context: .
+      dockerfile: FruitService/Dockerfile
+    ports:
+      - "5002:80"
+    networks:
+      - greenmarket-network
+
+  vegetables-service:
+    build:
+      context: .
+      dockerfile: VegetableService/Dockerfile
+    ports:
+      - "5003:80"
+    networks:
+      - greenmarket-network
+
+  nuts-service:
+    build:
+      context: .
+      dockerfile: NutsService/Dockerfile
+    ports:
+      - "5004:80"
+    networks:
+      - greenmarket-network
+
+  gateway-service:
+    build:
+      context: .
+      dockerfile: Gateway/Dockerfile
+    ports:
+      - "5000:8080"
+    depends_on:
+      - berries-service
+      - fruits-service
+      - vegetables-service
+      - nuts-service
+    networks:
+      - greenmarket-network
+
+networks:
+  greenmarket-network:
+    driver: bridge

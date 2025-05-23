@@ -4,61 +4,37 @@
       "DownstreamPathTemplate": "/api/berries",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "berries-service",
-          "Port": 80
-        }
+        {"Host": "berries-service", "Port": 80}
       ],
       "UpstreamPathTemplate": "/api/berries",
-      "UpstreamHttpMethod": [
-        "GET",
-        "HEAD"
-      ]
+      "UpstreamHttpMethod": ["GET", "HEAD"]
     },
     {
       "DownstreamPathTemplate": "/api/fruits",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "fruits-service",
-          "Port": 80
-        }
+        {"Host": "fruits-service", "Port": 80}
       ],
       "UpstreamPathTemplate": "/api/fruits",
-      "UpstreamHttpMethod": [
-        "GET",
-        "HEAD"
-      ]
+      "UpstreamHttpMethod": ["GET", "HEAD"]
     },
     {
       "DownstreamPathTemplate": "/api/vegetables",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "vegetables-service",
-          "Port": 80
-        }
+        {"Host": "vegetables-service", "Port": 80}
       ],
       "UpstreamPathTemplate": "/api/vegetables",
-      "UpstreamHttpMethod": [
-        "GET",
-        "HEAD"
-      ]
+      "UpstreamHttpMethod": ["GET", "HEAD"]
     },
     {
       "DownstreamPathTemplate": "/api/nuts",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "nuts-service",
-          "Port": 80
-        }
+        {"Host": "nuts-service", "Port": 80}
       ],
       "UpstreamPathTemplate": "/api/nuts",
-      "UpstreamHttpMethod": [
-        "GET",
-        "HEAD"
-      ]
+      "UpstreamHttpMethod": ["GET", "HEAD"]
     }
   ],
   "GlobalConfiguration": {

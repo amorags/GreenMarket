@@ -1,6 +1,9 @@
-﻿using Polly;
+﻿using System.Net;
+using System.Text;
+using Polly;
+using Polly.Extensions.Http;
 
-namespace BerryService;
+namespace Gateway;
 
 public static class ResiliencePolicies
 {
@@ -16,4 +19,13 @@ public static class ResiliencePolicies
 
     public static IAsyncPolicy<HttpResponseMessage> GetTimeoutPolicy() =>
         Policy.TimeoutAsync<HttpResponseMessage>(3);
+    
+    public static IAsyncPolicy<HttpResponseMessage> GetFallbackPolicy() =>
+        Policy<HttpResponseMessage>
+            .Handle<Exception>()
+            .FallbackAsync(new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent("[hey]", Encoding.UTF8, "application/json")
+            });
+
 }

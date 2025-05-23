@@ -1,15 +1,15 @@
-using FruitService.Models;
 using Microsoft.AspNetCore.Mvc;
+using NutService.Models;
 
 namespace NutService.Presentation;
 
 [ApiController]
 [Route("api/[controller]")]
-public class FruitsController : ControllerBase
+public class NutsController : ControllerBase
 {
-    private readonly ILogger<FruitsController> _logger;
+    private readonly ILogger<NutsController> _logger;
 
-    public FruitsController(ILogger<FruitsController> logger)
+    public NutsController(ILogger<NutsController> logger)
     {
         _logger = logger;
     }
@@ -17,13 +17,14 @@ public class FruitsController : ControllerBase
     [HttpGet]
     public IActionResult Get()
     {
-        var fruits = new List<FoodItem>
+        var nuts = new List<FoodItem>
         {
-            new() { Id = 1, Name = "Apple", Color = "Green", Calories = 52, InSeason = true },
-            new() { Id = 2, Name = "Banana", Color = "Yellow", Calories = 89, InSeason = true }
+            new() { Id = 1, Name = "Almond", Category = "Nuts", Color = "Brown", Calories = 579, InSeason = false },
+            new() { Id = 2, Name = "Walnut", Category = "Nuts", Color = "Brown", Calories = 654, InSeason = false }
         };
 
-        return Ok(fruits);
+
+        return Ok(nuts);
     }
 
     [HttpHead]
