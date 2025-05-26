@@ -58,7 +58,24 @@
       - seeds-service
     networks:
       - greenmarket-network
+        
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - NEXT_PUBLIC_API_BASE_URL=http://localhost:5000
+    depends_on:
+      - gateway-service
+    networks:
+      - greenmarket-network
 
 networks:
   greenmarket-network:
     driver: bridge
+
+volumes:
+  node_modules:

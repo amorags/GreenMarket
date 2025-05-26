@@ -10,7 +10,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 type FoodItem = {
   id: number
   name: string
-  category: "Berries" | "Fruits" | "Vegetables" | "Nuts"
+  category: "Berries" | "Fruits" | "Vegetables" | "Nuts" | "Seeds"
   color: string
   calories: number
   inSeason: boolean
@@ -22,52 +22,75 @@ type ServiceStatus = {
   Fruits: boolean
   Vegetables: boolean
   Nuts: boolean
+  Seeds: boolean
 }
+
+// Timeout configuration
+const API_TIMEOUT = 10000 // 10 seconds
+const HEALTH_CHECK_TIMEOUT = 5000 // 5 seconds for health checks
 
 export default function FoodDataPage() {
   const [data, setData] = useState<FoodItem[] | null>(null)
   const [loading, setLoading] = useState(false)
-  const [activeCategory, setActiveCategory] = useState<"all" | "Berries" | "Fruits" | "Vegetables" | "Nuts" | null>(
-    null,
-  )
+  const [activeCategory, setActiveCategory] = useState<
+    "all" | "Berries" | "Fruits" | "Vegetables" | "Nuts" | "Seeds" | null
+  >(null)
   // Track which services are available
   const [serviceStatus, setServiceStatus] = useState<ServiceStatus>({
     Berries: true,
     Fruits: true,
     Vegetables: true,
     Nuts: true,
+    Seeds: true,
   })
   // Track service outage messages
   const [serviceMessages, setServiceMessages] = useState<string[]>([])
   // Track if we're checking service health
   const [checkingHealth, setCheckingHealth] = useState(false)
 
-  // Check health of all services
+  // Check health of all services with timeout
   const checkServiceHealth = async () => {
     setCheckingHealth(true)
     const newStatus = { ...serviceStatus }
     const messages: string[] = []
 
-    // Check each service
-    const services: Array<keyof ServiceStatus> = ["Berries", "Fruits", "Vegetables", "Nuts"]
+    // Check each service through the gateway
+    const services: Array<keyof ServiceStatus> = ["Berries", "Fruits", "Vegetables", "Nuts", "Seeds"]
 
     for (const service of services) {
       try {
-        const endpoint = `/api/${service.toLowerCase()}`
+        // Use the gateway endpoint for health checks
+        const endpoint = `http://localhost:5000/api/${service.toLowerCase()}`
+
+        // Create AbortController for timeout
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), HEALTH_CHECK_TIMEOUT)
+
         const response = await fetch(endpoint, {
           method: "HEAD", // Use HEAD request to check availability without fetching data
           cache: "no-store", // Prevent caching
+          signal: controller.signal,
         })
 
+        clearTimeout(timeoutId)
         newStatus[service] = response.ok
 
         if (!response.ok) {
-          messages.push(`${service} service is currently down for maintenance. Please try again later.`)
+          messages.push(
+            `${service} service is currently down for maintenance (HTTP ${response.status}). Please try again later.`,
+          )
         }
       } catch (error) {
         console.error(`Error checking ${service} service health:`, error)
         newStatus[service] = false
-        messages.push(`${service} service is currently unavailable. Please try again later.`)
+
+        if (error instanceof Error && error.name === "AbortError") {
+          messages.push(
+            `${service} service is not responding (timeout after ${HEALTH_CHECK_TIMEOUT / 1000}s). Please try again later.`,
+          )
+        } else {
+          messages.push(`${service} service is currently unavailable. Please try again later.`)
+        }
       }
     }
 
@@ -93,21 +116,31 @@ export default function FoodDataPage() {
     return () => clearInterval(intervalId)
   }, [])
 
-  // Function to fetch all food data from all available services
+  // Function to fetch all food data from all available services with timeout
   const fetchAllFood = async () => {
     setLoading(true)
     setActiveCategory("all")
 
     try {
       const allData: FoodItem[] = []
-      const services: Array<keyof ServiceStatus> = ["Berries", "Fruits", "Vegetables", "Nuts"]
+      const services: Array<keyof ServiceStatus> = ["Berries", "Fruits", "Vegetables", "Nuts", "Seeds"]
 
       // Only fetch from available services
       for (const service of services) {
         if (serviceStatus[service]) {
           try {
-            const endpoint = `/api/${service.toLowerCase()}`
-            const response = await fetch(endpoint, { cache: "no-store" })
+            const endpoint = `http://localhost:5000/api/${service.toLowerCase()}`
+
+            // Create AbortController for timeout
+            const controller = new AbortController()
+            const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT)
+
+            const response = await fetch(endpoint, {
+              cache: "no-store",
+              signal: controller.signal,
+            })
+
+            clearTimeout(timeoutId)
 
             if (response.ok) {
               const serviceData = await response.json()
@@ -115,11 +148,23 @@ export default function FoodDataPage() {
             }
           } catch (error) {
             console.error(`Error fetching ${service} data:`, error)
+
             // Update service status if this was an unexpected failure
             const newStatus = { ...serviceStatus }
             newStatus[service] = false
             setServiceStatus(newStatus)
-            setServiceMessages([...serviceMessages, `${service} service failed unexpectedly. Please try again later.`])
+
+            if (error instanceof Error && error.name === "AbortError") {
+              setServiceMessages([
+                ...serviceMessages,
+                `${service} service timed out (${API_TIMEOUT / 1000}s). Please try again later.`,
+              ])
+            } else {
+              setServiceMessages([
+                ...serviceMessages,
+                `${service} service failed unexpectedly. Please try again later.`,
+              ])
+            }
           }
         }
       }
@@ -132,8 +177,8 @@ export default function FoodDataPage() {
     }
   }
 
-  // Function to fetch food by category with circuit breaker
-  const fetchFoodByCategory = async (category: "Berries" | "Fruits" | "Vegetables" | "Nuts") => {
+  // Function to fetch food by category with circuit breaker and timeout
+  const fetchFoodByCategory = async (category: "Berries" | "Fruits" | "Vegetables" | "Nuts" | "Seeds") => {
     // Check if service is available (circuit breaker pattern)
     if (!serviceStatus[category]) {
       console.error(`${category} service is currently unavailable`)
@@ -144,8 +189,18 @@ export default function FoodDataPage() {
     setActiveCategory(category)
 
     try {
-      const endpoint = `/api/${category.toLowerCase()}`
-      const response = await fetch(endpoint, { cache: "no-store" })
+      const endpoint = `http://localhost:5000/api/${category.toLowerCase()}`
+
+      // Create AbortController for timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT)
+
+      const response = await fetch(endpoint, {
+        cache: "no-store",
+        signal: controller.signal,
+      })
+
+      clearTimeout(timeoutId)
 
       if (!response.ok) {
         throw new Error(`${category} service returned status ${response.status}`)
@@ -161,8 +216,15 @@ export default function FoodDataPage() {
       newStatus[category] = false
       setServiceStatus(newStatus)
 
-      // Add error message
-      setServiceMessages([...serviceMessages, `${category} service failed unexpectedly. Please try again later.`])
+      // Add error message based on error type
+      if (error instanceof Error && error.name === "AbortError") {
+        setServiceMessages([
+          ...serviceMessages,
+          `${category} service timed out after ${API_TIMEOUT / 1000} seconds. Please try again later.`,
+        ])
+      } else {
+        setServiceMessages([...serviceMessages, `${category} service failed unexpectedly. Please try again later.`])
+      }
 
       // Clear data and active category
       setData(null)
@@ -173,7 +235,7 @@ export default function FoodDataPage() {
   }
 
   // Get the appropriate icon for each category button
-  const getCategoryIcon = (category: "all" | "Berries" | "Fruits" | "Vegetables" | "Nuts") => {
+  const getCategoryIcon = (category: "all" | "Berries" | "Fruits" | "Vegetables" | "Nuts" | "Seeds") => {
     switch (category) {
       case "all":
         return <Apple className="mr-2 h-4 w-4" />
@@ -184,6 +246,8 @@ export default function FoodDataPage() {
       case "Vegetables":
         return <Carrot className="mr-2 h-4 w-4" />
       case "Nuts":
+        return <Leaf className="mr-2 h-4 w-4" />
+      case "Seeds":
         return <Leaf className="mr-2 h-4 w-4" />
     }
   }
@@ -219,6 +283,14 @@ export default function FoodDataPage() {
           ))}
         </div>
       )}
+
+      {/* Timeout information */}
+      <div className="text-sm text-muted-foreground bg-muted/50 p-3 rounded-lg">
+        <p>
+          <strong>Timeout Settings:</strong> Health checks timeout after {HEALTH_CHECK_TIMEOUT / 1000}s, data requests
+          timeout after {API_TIMEOUT / 1000}s
+        </p>
+      </div>
 
       <div className="flex flex-wrap gap-4">
         <Button
@@ -318,6 +390,27 @@ export default function FoodDataPage() {
               <>
                 {getCategoryIcon("Nuts")}
                 Nuts
+              </>
+            )}
+          </Button>
+        )}
+
+        {serviceStatus.Seeds && (
+          <Button
+            onClick={() => fetchFoodByCategory("Seeds")}
+            disabled={loading}
+            variant={activeCategory === "Seeds" ? "default" : "outline"}
+            className="bg-orange-500 hover:bg-orange-600 text-white"
+          >
+            {loading && activeCategory === "Seeds" ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Loading Seeds...
+              </>
+            ) : (
+              <>
+                {getCategoryIcon("Seeds")}
+                Seeds
               </>
             )}
           </Button>
