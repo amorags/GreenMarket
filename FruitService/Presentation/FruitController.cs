@@ -19,8 +19,8 @@ public class FruitsController : ControllerBase
     {
         var fruits = new List<FoodItem>
         {
-            new() { Id = 1, Name = "Apple", Category = "Fruits", Color = "Green", Calories = 52, InSeason = true },
-            new() { Id = 2, Name = "Banana", Category = "Fruits", Color = "Yellow", Calories = 89, InSeason = true }
+            new() { Id = 2, Name = "Apple", Category = "Fruits", Color = "Green", Calories = 52, InSeason = true },
+            new() { Id = 3, Name = "Banana", Category = "Fruits", Color = "Yellow", Calories = 89, InSeason = true }
         };
 
 

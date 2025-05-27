@@ -19,8 +19,8 @@ public class VegetablesController : ControllerBase
     {
         var vegetables = new List<FoodItem>
         {
-            new() { Id = 1, Name = "Carrot", Category = "Vegetables", Color = "Orange", Calories = 41, InSeason = true },
-            new() { Id = 2, Name = "Spinach", Category = "Vegetables", Color = "Green", Calories = 23, InSeason = true }
+            new() { Id = 9, Name = "Carrot", Category = "Vegetables", Color = "Orange", Calories = 41, InSeason = true },
+            new() { Id = 10, Name = "Spinach", Category = "Vegetables", Color = "Green", Calories = 23, InSeason = true }
         };
 
         return Ok(vegetables);

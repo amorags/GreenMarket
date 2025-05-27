@@ -19,8 +19,8 @@ public IActionResult Get()
 {
     var seeds = new List<FoodItem>
     {
-        new() { Id = 1, Name = "Strawberry", Category = "Seeds", Color = "Red", Calories = 32, InSeason = true },
-        new() { Id = 2, Name = "Blueberry", Category = "Seeds", Color = "Blue", Calories = 57, InSeason = false }
+        new() { Id = 7, Name = "Strawberry", Category = "Seeds", Color = "Red", Calories = 32, InSeason = true },
+        new() { Id = 8, Name = "Blueberry", Category = "Seeds", Color = "Blue", Calories = 57, InSeason = false }
     };
 
     return Ok(seeds);

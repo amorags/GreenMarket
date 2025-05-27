@@ -25,7 +25,10 @@ public static class ResiliencePolicies
             .Handle<Exception>()
             .FallbackAsync(new HttpResponseMessage(HttpStatusCode.OK)
             {
-                Content = new StringContent("[hey]", Encoding.UTF8, "application/json")
+                Content = new StringContent("[]", Encoding.UTF8, "application/json")
             });
+
+    public static IAsyncPolicy<HttpResponseMessage> GetBulkheadPolicy() =>
+        Policy.BulkheadAsync<HttpResponseMessage>(maxParallelization: 10, maxQueuingActions: 20);
 
 }
