@@ -1,22 +1,22 @@
 using Polly;
 using BerriesService.Models;
-using Polly.Retry;
+using Polly.Wrap;
 
 namespace BerriesService.Services;
 
 public class BerryClient : IBerryService
 {
-    private readonly AsyncRetryPolicy _retryPolicy;
+    private readonly AsyncPolicyWrap _combinedPolicy;
     private static int _failCount = 0;
 
-    public BerryClient(AsyncRetryPolicy retryPolicy)
+    public BerryClient(AsyncPolicyWrap combinedPolicy)
     {
-        _retryPolicy = retryPolicy;
+        _combinedPolicy = combinedPolicy;
     }
 
     public async Task<List<FoodItem>> GetBerriesAsync()
     {
-        return await _retryPolicy.ExecuteAsync(async () =>
+        return await _combinedPolicy.ExecuteAsync(async () =>
         {
             // Simulate failure on the first 2 calls
             if (_failCount < 2)

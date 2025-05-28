@@ -1,5 +1,6 @@
 using Polly;
 using Polly.Retry;
+using Polly.Bulkhead;
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -19,6 +20,19 @@ namespace BerriesService.Policies
                     {
                         Console.WriteLine($"Retry {attempt} after {timespan.TotalSeconds}s due to {outcome.Result?.StatusCode}");
                     });
+        }
+
+
+        public static AsyncBulkheadPolicy GetDatabaseBulkheadPolicy()
+        {
+            return Policy.BulkheadAsync(
+                maxParallelization: 2, 
+                maxQueuingActions: 3, 
+                onBulkheadRejectedAsync: context =>
+                {
+                    Console.WriteLine("Database bulkhead rejected - too many concurrent operations");
+                    return Task.CompletedTask;
+                });
         }
 
         public static AsyncRetryPolicy GetGenericRetryPolicy()
