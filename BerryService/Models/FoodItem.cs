@@ -1,4 +1,4 @@
-namespace BerryService.Models;
+namespace BerriesService.Models;
 
 public class FoodItem
 {

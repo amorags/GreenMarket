@@ -1,4 +1,4 @@
-using BerryService.Models;
+using BerriesService.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BerryService.Presentation;
@@ -8,24 +8,21 @@ namespace BerryService.Presentation;
 public class BerriesController : ControllerBase
 {
     private readonly ILogger<BerriesController> _logger;
+    private readonly IBerryService _berryClient;
 
-    public BerriesController(ILogger<BerriesController> logger)
+
+    public BerriesController(ILogger<BerriesController> logger, IBerryService berryClient)
     {
         _logger = logger;
+        _berryClient = berryClient;
     }
 
     [HttpGet]
-public async Task<IActionResult> Get()
-{
-
-    var berries = new List<FoodItem>
+    public async Task<IActionResult> Get()
     {
-        new() { Id = 1, Name = "Strawberry", Category = "Berries", Color = "Red", Calories = 32, InSeason = true },
-        new() { Id = 2, Name = "Blueberry", Category = "Berries", Color = "Blue", Calories = 57, InSeason = false }
-    };
-
-    return Ok(berries);
-}
+        var berries = await _berryClient.GetBerriesAsync();
+        return Ok(berries);
+    }
 
     [HttpHead]
     public IActionResult HealthCheck() => Ok();
