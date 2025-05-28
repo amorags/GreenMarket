@@ -4,55 +4,107 @@
       "DownstreamPathTemplate": "/api/berries",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        {"Host": "berries-service", "Port": 80}
+        { "Host": "berries-service-1", "Port": 80 },
+        { "Host": "berries-service-2", "Port": 80 }
       ],
       "UpstreamPathTemplate": "/api/berries",
-      "UpstreamHttpMethod": ["GET", "HEAD"]
+      "UpstreamHttpMethod": ["GET", "HEAD"],
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 30000,
+        "DurationOfBreak": 30000,
+        "TimeoutValue": 5000
+      },
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "Period": "1m",
+        "PeriodTimespan": 60,
+        "Limit": 100
+      }
     },
     {
       "DownstreamPathTemplate": "/api/seeds",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "seeds-service",
-          "Port": 80
-        }
+        { "Host": "seeds-service", "Port": 80 }
       ],
       "UpstreamPathTemplate": "/api/seeds",
-      "UpstreamHttpMethod": [
-        "GET",
-        "HEAD"
-      ]
+      "UpstreamHttpMethod": ["GET", "HEAD"],
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 2,
+        "DurationOfBreak": 15000,
+        "TimeoutValue": 3000
+      },
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "30s",
+        "PeriodTimespan": 30,
+        "Limit": 50
+      }
     },
     {
       "DownstreamPathTemplate": "/api/fruits",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        {"Host": "fruits-service", "Port": 80}
+        { "Host": "fruits-service-1", "Port": 80 },
+        { "Host": "fruits-service-2", "Port": 80 },
+        { "Host": "fruits-service-3", "Port": 80 }
       ],
       "UpstreamPathTemplate": "/api/fruits",
-      "UpstreamHttpMethod": ["GET", "HEAD"]
+      "UpstreamHttpMethod": ["GET", "HEAD"],
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      },
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 2,
+        "DurationOfBreak": 45000,
+        "TimeoutValue": 8000
+      },
+      "RateLimitOptions": {
+        "EnableRateLimiting": true,
+        "Period": "1h",
+        "PeriodTimespan": 3600,
+        "Limit": 1000
+      }
     },
     {
       "DownstreamPathTemplate": "/api/vegetables",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        {"Host": "vegetables-service", "Port": 80}
+        { "Host": "vegetables-service", "Port": 80 }
       ],
       "UpstreamPathTemplate": "/api/vegetables",
-      "UpstreamHttpMethod": ["GET", "HEAD"]
+      "UpstreamHttpMethod": ["GET", "HEAD"],
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 1,
+        "DurationOfBreak": 60000,
+        "TimeoutValue": 2000
+      }
     },
     {
       "DownstreamPathTemplate": "/api/nuts",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        {"Host": "nuts-service", "Port": 80}
+        { "Host": "nuts-service", "Port": 80 }
       ],
       "UpstreamPathTemplate": "/api/nuts",
-      "UpstreamHttpMethod": ["GET", "HEAD"]
+      "UpstreamHttpMethod": ["GET", "HEAD"],
+      "QoSOptions": {
+        "ExceptionsAllowedBeforeBreaking": 2,
+        "DurationOfBreak": 60000,
+        "TimeoutValue": 2000
+      }
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://gateway-service"
+    "BaseUrl": "http://gateway-service",
+    "RateLimitOptions": {
+      "DisableRateLimitHeaders": false,
+      "QuotaExceededMessage": "API rate limit exceeded",
+      "HttpStatusCode": 429
+    }
   }
 }

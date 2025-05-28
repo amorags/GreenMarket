@@ -15,8 +15,9 @@ public class BerriesController : ControllerBase
     }
 
     [HttpGet]
-public IActionResult Get()
+public async Task<IActionResult> Get()
 {
+
     var berries = new List<FoodItem>
     {
         new() { Id = 1, Name = "Strawberry", Category = "Berries", Color = "Red", Calories = 32, InSeason = true },

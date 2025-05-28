@@ -1,19 +1,46 @@
 ﻿services:
-  berries-service:
+  berries-service-1:
     build:
       context: .
       dockerfile: BerryService/Dockerfile
     ports:
-      - "5001:80"
+      - "5101:80"
     networks:
       - greenmarket-network
 
-  fruits-service:
+  berries-service-2:
+    build:
+      context: .
+      dockerfile: BerryService/Dockerfile
+    ports:
+      - "5102:80"
+    networks:
+      - greenmarket-network
+
+  fruits-service-1:
     build:
       context: .
       dockerfile: FruitService/Dockerfile
     ports:
-      - "5002:80"
+      - "5201:80"
+    networks:
+      - greenmarket-network
+
+  fruits-service-2:
+    build:
+      context: .
+      dockerfile: FruitService/Dockerfile
+    ports:
+      - "5202:80"
+    networks:
+      - greenmarket-network
+
+  fruits-service-3:
+    build:
+      context: .
+      dockerfile: FruitService/Dockerfile
+    ports:
+      - "5203:80"
     networks:
       - greenmarket-network
 
@@ -50,9 +77,14 @@
       dockerfile: Gateway/Dockerfile
     ports:
       - "5000:8080"
+    environment:  
+      - ASPNETCORE_ENVIRONMENT=Docker  
     depends_on:
-      - berries-service
-      - fruits-service
+      - berries-service-1
+      - berries-service-2
+      - fruits-service-1
+      - fruits-service-2
+      - fruits-service-3
       - vegetables-service
       - nuts-service
       - seeds-service

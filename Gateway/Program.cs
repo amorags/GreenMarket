@@ -1,26 +1,23 @@
 using Gateway;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using Ocelot.Provider.Polly;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Load environment-specific Ocelot config
-var env = builder.Environment.EnvironmentName.ToLower();
-var configFile = env == "development" ? "ocelot.Local.json" : "ocelot.Docker.json";
+// Environment detection
+var env = builder.Environment.EnvironmentName;
+var configFile = env.Equals("Docker", StringComparison.OrdinalIgnoreCase)
+    ? "ocelot.Docker.json"
+    : "ocelot.Local.json";
 
 builder.Configuration.AddJsonFile(configFile, optional: false, reloadOnChange: true);
+builder.Services.AddSingleton<LoggingService>();
 
-builder.Services.AddHttpClient("OcelotClient")
-    .AddPolicyHandler(ResiliencePolicies.GetBulkheadPolicy())
-    .AddPolicyHandler(ResiliencePolicies.GetRetryPolicy())
-    .AddPolicyHandler(ResiliencePolicies.GetCircuitBreakerPolicy())
-    .AddPolicyHandler(ResiliencePolicies.GetTimeoutPolicy())
-    .AddPolicyHandler(ResiliencePolicies.GetFallbackPolicy());
-
-builder.Services.AddTransient<ResilienceDelegatingHandler>();
-
+// Configure Ocelot with Polly support for QoS
 builder.Services.AddOcelot(builder.Configuration)
-    .AddDelegatingHandler<ResilienceDelegatingHandler>(true);
+    .AddPolly();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -44,8 +41,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseCors("AllowFrontend");
-app.UseOcelot().Wait();
-
+await app.UseOcelot();
 app.UseAuthorization();
 app.MapControllers();
 
